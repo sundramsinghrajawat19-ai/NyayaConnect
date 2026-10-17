@@ -1,124 +1,100 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NyayaConnect | Legal Help, Made Clear</title>
+  <title>NyayaConnect | Legal Clarity for Everyone</title>
+  <meta name="description" content="Understand legal issues in simple language and explore pathways to legal support with NyayaConnect.">
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
 </head>
 <body>
   <header class="navbar">
-    <a href="#" class="brand">Nyaya<span>Connect</span></a>
-    <span class="nav-note">Legal help, made clearer.</span>
-    <a href="#analyzer" class="nav-link">Find legal help ↗</a>
+    <a href="/" class="brand">Nyaya<span>Connect</span></a>
+    <span class="nav-note">Legal clarity. Human connection.</span>
+    <a href="/lawyers.html" class="nav-link">Explore legal support ↗</a>
   </header>
 
   <main>
     <section class="hero">
-      <div class="eyebrow">YOUR FIRST STEP TOWARDS CLARITY</div>
-      <h1>Legal problems are complex.<br>
-        <span>Finding help shouldn't be.</span>
-      </h1>
-      <p>
-        Explain your situation in your own words. Explore a simple
-        explanation and find lawyers whose experience may fit your needs.
-      </p>
-      <a href="#analyzer" class="primary-button">Understand my situation →</a>
-      <div class="trust-note">Private by design · Clear explanations · Informed choices</div>
-    </section>
+      <div class="eyebrow">A MORE ACCESSIBLE LEGAL EXPERIENCE</div>
 
-    <section class="workspace" id="analyzer">
-      <div class="section-heading">
-        <div>
-          <div class="eyebrow">01 / TELL US WHAT HAPPENED</div>
-          <h2>Let's understand your case.</h2>
-        </div>
-        <span class="step-label">STEP 1 OF 2</span>
+      <h1>Justice begins with<br>
+        <span>understanding your rights.</span>
+      </h1>
+
+      <p>
+        Legal problems can feel overwhelming. Start with clear,
+        easy-to-understand legal information and explore the next
+        steps toward finding appropriate support.
+      </p>
+
+      <div class="hero-actions">
+        <a href="/analyze.html" class="primary-button">
+          Understand my situation →
+        </a>
+        <a href="/lawyers.html" class="secondary-button">
+          Explore lawyers
+        </a>
       </div>
 
-      <form id="case-form">
-        <label for="problem">Describe your legal problem</label>
-        <textarea id="problem" rows="5" required minlength="15"
-          placeholder="For example: My landlord has refused to return my security deposit even though I have moved out..."></textarea>
-        <div class="field-hint">
-          Share only the details needed to explain your issue. Do not include
-          names, account numbers or other sensitive personal information.
-        </div>
+      <div class="trust-note">
+        Clear information · Informed decisions · Responsible guidance
+      </div>
+    </section>
 
-        <div class="form-grid">
-          <div>
-            <label for="category">What is the issue about?</label>
-            <select id="category">
-              <option value="auto">Help me identify the category</option>
-              <option value="property">Property or landlord</option>
-              <option value="family">Family or matrimonial matter</option>
-              <option value="employment">Employment or unpaid salary</option>
-              <option value="consumer">Consumer complaint</option>
-              <option value="criminal">Criminal matter</option>
-              <option value="business">Business or contract dispute</option>
-            </select>
-          </div>
-          <div>
-            <label for="location">City or district</label>
-            <input id="location" placeholder="e.g. Gwalior">
-          </div>
-        </div>
+    <section class="workspace">
+      <div class="eyebrow">YOUR JOURNEY STARTS HERE</div>
+      <h2>One platform. Two ways to move forward.</h2>
+      <p class="section-description">
+        Whether you need clarity about a legal issue or want to explore
+        legal support, take your next step with confidence.
+      </p>
 
-        <button class="primary-button submit-button" type="submit">
-          Explore my options →
-        </button>
-      </form>
+      <div class="feature-grid">
+        <article class="feature">
+          <span>01 / UNDERSTAND</span>
+          <h3>AI Legal Analyzer</h3>
+          <p>
+            Describe your situation and receive a plain-language
+            explanation with possible next steps.
+          </p>
+          <a href="/analyze.html" class="nav-link">Analyze your issue →</a>
+        </article>
 
-      <div id="results" hidden aria-live="polite">
-        <div class="result-divider"></div>
-        <div class="eyebrow">02 / YOUR STARTING POINT</div>
-        <h2>Let's make this clearer.</h2>
-
-        <div class="result-panel">
-          <h3>What your situation may involve</h3>
-          <p id="explanation"></p>
-          <h3>What you could do next</h3>
-          <ul id="next-steps"></ul>
-        </div>
-
-        <div class="lawyer-heading">
-          <div>
-            <div class="eyebrow">POTENTIAL MATCHES</div>
-            <h2>Lawyers to explore</h2>
-          </div>
-          <span class="match-note">Illustrative matches</span>
-        </div>
-        <p class="field-hint">
-          These sample profiles demonstrate the matching experience. They are
-          not real or verified lawyers, and the results are not legal advice.
-        </p>
-        <div id="lawyer-list" class="lawyer-list"></div>
-        <button id="reset-button" class="secondary-button" type="button">
-          Analyze another issue
-        </button>
+        <article class="feature">
+          <span>02 / CONNECT</span>
+          <h3>Lawyer Directory</h3>
+          <p>
+            Explore legal practice areas and learn what to consider
+            when looking for suitable legal assistance.
+          </p>
+          <a href="/lawyers.html" class="nav-link">Explore legal support →</a>
+        </article>
       </div>
     </section>
 
     <section class="how-it-works">
-      <div class="eyebrow">BUILT AROUND YOUR NEEDS</div>
-      <h2>More than a lawyer directory.</h2>
+      <div class="eyebrow">DESIGNED AROUND YOU</div>
+      <h2>Legal information, made easier.</h2>
+
       <div class="feature-grid">
         <article class="feature">
           <span>01</span>
-          <h3>Understand</h3>
-          <p>Explore legal concepts in plain language, with sources to be added.</p>
+          <h3>Start with clarity</h3>
+          <p>Explain your issue in your own words without needing legal terminology.</p>
         </article>
+
         <article class="feature">
           <span>02</span>
-          <h3>Find your fit</h3>
-          <p>Compare relevant experience, availability and transparent fees.</p>
+          <h3>Explore your options</h3>
+          <p>Review general information and practical steps relevant to your situation.</p>
         </article>
+
         <article class="feature">
           <span>03</span>
-          <h3>Stay on track</h3>
-          <p>Keep consultations, agreed next steps and reminders organized.</p>
+          <h3>Make informed choices</h3>
+          <p>Identify questions to discuss with a qualified legal professional.</p>
         </article>
       </div>
     </section>
@@ -126,7 +102,15 @@
 
   <footer>
     <strong>NyayaConnect</strong>
-    <p>This prototype does not provide legal advice or create a lawyer-client relationship.</p>
+    <p>
+      NyayaConnect provides general legal information, not legal advice.
+      Its sample lawyer profiles are illustrative and are not verified professionals.
+    </p>
+    <p>
+      <a href="/analyze.html">AI Legal Analyzer</a> ·
+      <a href="/lawyers.html">Lawyer Directory</a>
+    </p>
   </footer>
 </body>
 </html>
+```
