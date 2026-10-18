@@ -103,11 +103,23 @@ if (form) {
 
       // Show lawyer matches only on pages that contain the lawyer list.
       if (lawyerList) {
-        const matches = lawyers.filter(lawyer => lawyer.category === category);
+        const matches = lawyers.filter(function (lawyer) {
+  return lawyer.category === category;
+});
 
-        (matches.length ? matches : lawyers).forEach(function (lawyer) {
-          lawyerList.appendChild(createLawyerCard(lawyer));
-        });
+if (matches.length) {
+  matches.forEach(function (lawyer) {
+    lawyerList.appendChild(createLawyerCard(lawyer));
+  });
+} else {
+  const message = document.createElement("p");
+  message.className = "field-hint";
+  message.textContent =
+    "We couldn't find a matching sample profile for this issue. " +
+    "Try describing your problem in more detail or explore the full lawyer directory.";
+
+  lawyerList.appendChild(message);
+}
       }
 
       if (status) status.textContent = "Analysis complete. This is general information, not legal advice.";
