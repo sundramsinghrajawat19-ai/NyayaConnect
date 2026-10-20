@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case History | NyayaConnect</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .history-container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .case-card {
+      background: white;
+      padding: 24px;
+      margin: 20px 0;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 12px #0000000d;
+    }
+
+    .case-card h3 { color: #2447a8; }
+    .case-card p { line-height: 1.6; }
+    .case-card li { margin: 10px 0; line-height: 1.5; }
+    .case-date { color: #666; font-size: 14px; }
+    .loading { text-align: center; padding: 30px; }
+  </style>
+</head>
+<body>
+  <main class="history-container">
+    <h1>Case History</h1>
+    <p>View your previously analyzed legal problems and recommended next steps.</p>
+
+    <div id="case-list" class="loading">Loading case history...</div>
+  </main>
+
+  <script>
+    async function loadCases() {
+      const container = document.getElementById("case-list");
+
+      try {
+        const response = await fetch("/api/cases");
+
+        if (!response.ok) {
+          throw new Error("Unable to load case history.");
+        }
+
+        const cases = await response.json();
+        container.className = "";
+
+        if (cases.length === 0) {
+          container.textContent = "No saved cases found yet.";
+          return;
+        }
+
+        cases.forEach(item => {
+          const card = document.createElement("article");
+          card.className = "case-card";
+
+          const title = document.createElement("h3");
+          title.textContent = "Legal Problem";
+
+          const problem = document.createElement("p");
+          problem.textContent = item.problem;
+
+          const explanationTitle = document.createElement("h3");
+          explanationTitle.textContent = "Legal Explanation";
+
+          const explanation = document.createElement("p");
+          explanation.textContent = item.explanation;
+
+          const stepsTitle = document.createElement("h3");
+          stepsTitle.textContent = "Recommended Next Steps";
+
+          const steps = document.createElement("ul");
+
+          (item.nextSteps || []).forEach(step => {
+            const li = document.createElement("li");
+            li.textContent = step;
+            steps.appendChild(li);
+          });
+
+          const date = document.createElement("p");
+          date.className = "case-date";
+          date.textContent = item.createdAt
+            ? "Saved: " + new Date(item.createdAt).toLocaleString()
+            : "";
+
+          card.append(
+            title, problem,
+            explanationTitle, explanation,
+            stepsTitle, steps, date
+          );
+
+          container.appendChild(card);
+        });
+      } catch (error) {
+        container.textContent =
+          "Could not load case history. Please try again.";
+        console.error(error);
+      }
+    }
+
+    loadCases();
+  </script>
+</body>
+</html>

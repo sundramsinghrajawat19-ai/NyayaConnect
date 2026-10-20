@@ -14,13 +14,71 @@ if (form) {
   const status = document.getElementById("status");
 
   const lawyers = [
-    { name: "Demo Lawyer A", category: "property", specialty: "Property and tenancy disputes", experience: "8 years (illustrative)", fee: "₹800 (sample fee)" },
-    { name: "Demo Lawyer B", category: "family", specialty: "Family and matrimonial matters", experience: "10 years (illustrative)", fee: "₹1,000 (sample fee)" },
-    { name: "Demo Lawyer C", category: "employment", specialty: "Employment and wage disputes", experience: "6 years (illustrative)", fee: "₹700 (sample fee)" },
-    { name: "Demo Lawyer D", category: "consumer", specialty: "Consumer complaints and disputes", experience: "7 years (illustrative)", fee: "₹750 (sample fee)" },
-    { name: "Demo Lawyer E", category: "criminal", specialty: "Criminal law", experience: "9 years (illustrative)", fee: "₹1,200 (sample fee)" },
-    { name: "Demo Lawyer F", category: "business", specialty: "Contracts and business disputes", experience: "8 years (illustrative)", fee: "₹1,000 (sample fee)" }
-  ];
+  {
+    name: "Demo Lawyer A",
+    category: "employment",
+    specialty: "Unpaid Salary and Wage Disputes",
+    experience: "8 years (illustrative)",
+    fee: "₹800 (sample fee)",
+    keywords: ["salary", "wage", "unpaid", "pay", "payment"]
+  },
+  {
+    name: "Demo Lawyer B",
+    category: "employment",
+    specialty: "Workplace and Termination Disputes",
+    experience: "10 years (illustrative)",
+    fee: "₹1,000 (sample fee)",
+    keywords: ["termination", "fired", "dismissed", "workplace", "harassment"]
+  },
+  {
+    name: "Demo Lawyer C",
+    category: "property",
+    specialty: "Rental Deposits and Tenant Disputes",
+    experience: "8 years (illustrative)",
+    fee: "₹800 (sample fee)",
+    keywords: ["rent", "rental", "tenant", "landlord", "deposit", "eviction"]
+  },
+  {
+    name: "Demo Lawyer D",
+    category: "property",
+    specialty: "Property Ownership and Title Disputes",
+    experience: "9 years (illustrative)",
+    fee: "₹1,000 (sample fee)",
+    keywords: ["ownership", "title", "land", "property", "boundary"]
+  },
+  {
+    name: "Demo Lawyer E",
+    category: "consumer",
+    specialty: "Refunds and Defective Products",
+    experience: "7 years (illustrative)",
+    fee: "₹750 (sample fee)",
+    keywords: ["refund", "defective", "consumer", "product", "seller"]
+  },
+  {
+    name: "Demo Lawyer F",
+    category: "business",
+    specialty: "Contracts and Unpaid Invoices",
+    experience: "8 years (illustrative)",
+    fee: "₹1,000 (sample fee)",
+    keywords: ["contract", "invoice", "commercial", "business", "agreement"]
+  },
+  {
+    name: "Demo Lawyer G",
+    category: "family",
+    specialty: "Divorce and Matrimonial Matters",
+    experience: "10 years (illustrative)",
+    fee: "₹1,000 (sample fee)",
+    keywords: ["divorce", "marriage", "matrimonial", "spouse"]
+  },
+  {
+    name: "Demo Lawyer H",
+    category: "criminal",
+    specialty: "Criminal Complaints and Defence",
+    experience: "9 years (illustrative)",
+    fee: "₹1,200 (sample fee)",
+    keywords: ["police", "arrest", "criminal", "fir", "theft", "assault"]
+  }
+];
 
   function identifyCategory(text) {
     const value = text.toLowerCase();

@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,6 +13,7 @@
     <a href="/" class="brand">Nyaya<span>Connect</span></a>
     <span class="nav-note">Legal clarity. Human connection.</span>
     <a href="/lawyers.html" class="nav-link">Explore legal support ↗</a>
+    <button id="logoutBtn" type="button">Logout</button>
   </header>
 
   <main>
@@ -30,13 +31,18 @@
       </p>
 
       <div class="hero-actions">
-        <a href="/analyze.html" class="primary-button">
-          Understand my situation →
-        </a>
-        <a href="/lawyers.html" class="secondary-button">
-          Explore lawyers
-        </a>
-      </div>
+  <a href="/analyze.html" class="primary-button">
+    Understand my situation →
+  </a>
+
+  <a href="/lawyers.html" class="secondary-button">
+    Explore lawyers
+  </a>
+
+  <a href="/history.html" class="secondary-button">
+    Case History
+  </a>
+</div>
 
       <div class="trust-note">
         Clear information · Informed decisions · Responsible guidance
@@ -107,10 +113,28 @@
       Its sample lawyer profiles are illustrative and are not verified professionals.
     </p>
     <p>
-      <a href="/analyze.html">AI Legal Analyzer</a> ·
-      <a href="/lawyers.html">Lawyer Directory</a>
+      <a href="/analyze.html">AI Legal Analyzer</a> .
+      <a href="/lawyers.html">Lawyer Directory</a> .
+      <a href="history.html">Case History</a> 
     </p>
   </footer>
 </body>
+<script>
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+
+    if (response.ok) {
+      window.location.href = "/login.html";
+    } else {
+      alert("Logout failed. Please try again.");
+    }
+  } catch (error) {
+    alert("Could not connect to the server.");
+  }
+});
+</script>
 </html>
-```
