@@ -119,22 +119,20 @@
     </p>
   </footer>
 </body>
+
 <script>
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   try {
-    const response = await fetch("/api/logout", {
+    await fetch("/api/logout", {
       method: "POST",
       credentials: "same-origin"
     });
-
-    if (response.ok) {
-      window.location.href = "/login.html";
-    } else {
-      alert("Logout failed. Please try again.");
-    }
   } catch (error) {
-    alert("Could not connect to the server.");
+    console.error("Logout request failed:", error);
   }
+
+  window.location.replace("/login.html");
 });
 </script>
+
 </html>

@@ -39,6 +39,30 @@ app.use(session({
   }
 }));
 
+// Protect HTML pages unless the user is logged in
+app.use((req, res, next) => {
+  console.log("PAGE CHECK:", req.path, "USER:", !!req.session?.user);
+
+  if (
+    req.path === "/login.html" ||
+    req.path === "/signup.html" ||
+    req.path.startsWith("/api/")
+  ) {
+    return next();
+  }
+
+  if (req.path === "/" || req.path.endsWith(".html")) {
+    if (!req.session?.user) {
+      return res.redirect("/login.html");
+    }
+  }
+
+  next();
+});
+
+// Serve static files only after checking authentication
+app.use(express.static(path.join(__dirname, "public")));
+
 async function connectDB() {
   await client.connect();
 
@@ -50,9 +74,44 @@ async function connectDB() {
 
   await users.createIndex({ email: 1 }, { unique: true });
 
+// Public pages that do not require login
+const publicPages = ["/login.html", "/signup.html"];
 
+// Serve public pages and protect all other HTML pages
+app.use((req, res, next) => {
+  console.log("PAGE CHECK:", req.path, "USER:", !!req.session?.user);
 
-  app.use(express.static(path.join(__dirname, "public")));
+  if (
+    req.path === "/login.html" ||
+    req.path === "/signup.html" ||
+    req.path === "/api/me" ||
+    req.path.startsWith("/api/login") ||
+    req.path.startsWith("/api/signup") ||
+    req.path.startsWith("/api/logout")
+  ) {
+    return next();
+  }
+
+  const privatePages = [
+    "/",
+    "/index.html",
+    "/history.html",
+    "/analyze.html",
+    "/lawyers.html"
+  ];
+
+  if (
+    (privatePages.includes(req.path) || req.path.endsWith(".html")) &&
+    !req.session?.user
+  ) {
+    return res.redirect("/login.html");
+  }
+
+  next();
+});
+
+app.use(express.static(path.join(__dirname, "public")));
+
 
   console.log("MongoDB connected successfully!");
 }
