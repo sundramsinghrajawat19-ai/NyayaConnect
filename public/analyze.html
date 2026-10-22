@@ -35,7 +35,47 @@
         </div>
       </div>
 
-      <form id="case-form">
+      
+
+<div class="document-upload">
+  <h3>📄 Summarize a legal document</h3>
+  <p>
+    Upload a lengthy legal document or a photo of a document
+    to get a plain-language summary.
+  </p>
+
+  <form id="document-form">
+    <label for="legal-document">Choose a PDF or image</label>
+    <input
+      type="file"
+      id="legal-document"
+      accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
+      required
+    >
+
+    <p class="field-hint">
+      PDF, PNG, JPG or WebP. Maximum size: 10 MB.
+      Use test documents without sensitive personal information.
+    </p>
+
+        <button class="primary-button" type="submit">
+      Summarize document →
+    </button>
+  </form>
+
+  <div id="document-results" hidden aria-live="polite">
+    <h3>Document summary</h3>
+    <div id="document-summary"></div>
+
+    <h3>Important details</h3>
+    <ul id="document-details"></ul>
+
+    <h3>Questions to discuss with a lawyer</h3>
+    <ul id="document-questions"></ul>
+    </div>
+</div>
+
+<form id="case-form">
         <label for="problem">Describe your legal problem</label>
         <textarea id="problem" rows="6" required minlength="15"
           placeholder="Describe your issue without including names, account numbers, or confidential information..."></textarea>
@@ -58,8 +98,17 @@
           <h3>General explanation</h3>
           <p id="explanation"></p>
 
+                    <h3>Potential risks and consequences</h3>
+          <ul id="risks"></ul>
+
           <h3>Possible next steps</h3>
           <ul id="next-steps"></ul>
+
+          <h3>Evidence checklist</h3>
+          <ul id="evidence-checklist"></ul>
+
+          <h3>Relevant laws to explore</h3>
+          <ul id="relevant-laws"></ul>
         </div>
 
         <section class="lawyer-recommendations">
