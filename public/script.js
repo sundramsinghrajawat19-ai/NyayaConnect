@@ -51,18 +51,26 @@ const relevantLaws = document.getElementById("relevant-laws");
     isDemo: false
   }
 ];
-  function identifyCategory(text) {
-    const value = text.toLowerCase();
+  
+function identifyCategory(text) {
+  const value = text.toLowerCase();
 
-    if (/salary|wage|employer|employment|workplace|termination/.test(value)) return "employment";
-    if (/landlord|tenant|rent|rental|security deposit|property|eviction/.test(value)) return "property";
-    if (/divorce|custody|matrimonial|marriage|maintenance|family dispute/.test(value)) return "family";
-    if (/consumer|refund|defective product|seller|service complaint/.test(value)) return "consumer";
-    if (/police|arrest|criminal|\bfir\b|theft|assault/.test(value)) return "criminal";
-    if (/contract|business|invoice|commercial|breach of agreement/.test(value)) return "business";
+  const rules = [
+    ["employment", /\bsalary\b|\bunpaid wages?\b|\bemployer\b|\bworkplace\b|\btermination\b|\bwrongful dismissal\b|\bgratuity\b|\bpf\b/],
+    ["property", /\blandlord\b|\btenant\b|\brent\b|\beviction\b|\bland dispute\b|\bproperty\b|\bpossession\b|\bbuilder\b/],
+    ["family", /\bdivorce\b|\bcustody\b|\bmaintenance\b|\balimony\b|\bdomestic violence\b|\bmatrimonial\b|\bmarriage\b/],
+    ["consumer", /\bconsumer\b|\brefund\b|\bdefective product\b|\bservice complaint\b|\bconsumer forum\b|\be-commerce\b/],
+    ["criminal", /\bpolice\b|\barrest\b|\bcriminal\b|\bfir\b|\btheft\b|\bassault\b|\bbail\b|\bcheating\b|\bfraud\b/],
+    ["business", /\bcontract\b|\binvoice\b|\bcommercial\b|\bbreach of agreement\b|\bbusiness dispute\b|\bpayment default\b/]
+  ];
 
-    return "general";
+  for (const [category, pattern] of rules) {
+    if (pattern.test(value)) return category;
   }
+
+  return "general";
+}
+
 
   function createLawyerCard(lawyer) {
   const card = document.createElement("article");
