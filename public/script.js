@@ -126,48 +126,30 @@ function identifyCategory(text) {
 
     if (lawyerList) lawyerList.replaceChildren();
     if (lawyerList) {
-  const problemText = description.toLowerCase();
+  const message = document.createElement("p");
+  message.className = "field-hint";
 
-  const matches = lawyers
-    .map(function (lawyer) {
-      const keywordScore = lawyer.keywords.filter(function (keyword) {
-        return problemText.includes(keyword.toLowerCase());
-      }).length;
+  const categoryNames = {
+    employment: "employment law",
+    property: "property law",
+    family: "family law",
+    consumer: "consumer law",
+    criminal: "criminal law",
+    business: "business law",
+    general: "general legal issues"
+  };
 
-      const categoryScore =
-        lawyer.category === category ? 2 :
-        lawyer.category === "general" ? 1 : 0;
+  message.textContent =
+    "Your issue appears related to " +
+    (categoryNames[category] || "general legal issues") +
+    ". We currently have no verified specialty or keyword data to rank these lawyer profiles accurately. Please confirm each lawyer's qualifications and practice area before hiring.";
 
-      return {
-        lawyer: lawyer,
-        score: categoryScore + keywordScore
-      };
-    })
-    .filter(function (match) {
-      return match.score > 0;
-    })
-    .sort(function (a, b) {
-      return b.score - a.score;
-    })
-    .map(function (match) {
-      return match.lawyer;
-    });
+  lawyerList.appendChild(message);
 
-  if (matches.length) {
-    matches.forEach(function (lawyer) {
-      lawyerList.appendChild(createLawyerCard(lawyer));
-    });
-  } else {
-    const message = document.createElement("p");
-    message.className = "field-hint";
-    message.textContent =
-      "No matching profiles found. Please explore the lawyer directory.";
-
-    lawyerList.appendChild(message);
-  }
+  lawyers.forEach(function (lawyer) {
+    lawyerList.appendChild(createLawyerCard(lawyer));
+  });
 }
-    if (status) status.textContent = "Please wait while Gemini analyzes your description.";
-
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
