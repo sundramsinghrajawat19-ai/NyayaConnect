@@ -18,71 +18,39 @@ const relevantLaws = document.getElementById("relevant-laws");
 
   const lawyers = [
   {
-    name: "Demo Lawyer A",
-    category: "employment",
-    specialty: "Unpaid Salary and Wage Disputes",
-    experience: "8 years (illustrative)",
-    fee: "₹800 (sample fee)",
-    keywords: ["salary", "wage", "unpaid", "pay", "payment"]
+    name: "Romesh Pratap Singh",
+    category: "general",
+    specialty: "Practice areas need confirmation",
+    location: "Gwalior, Madhya Pradesh",
+    enrollmentNumber: "2410/2011 (listed in 2020 panel list)",
+    experience: "",
+    fee: "",
+    keywords: [],
+    isDemo: false
   },
   {
-    name: "Demo Lawyer B",
-    category: "employment",
-    specialty: "Workplace and Termination Disputes",
-    experience: "10 years (illustrative)",
-    fee: "₹1,000 (sample fee)",
-    keywords: ["termination", "fired", "dismissed", "workplace", "harassment"]
+    name: "Himanshu Sharma",
+    category: "general",
+    specialty: "Practice areas need confirmation",
+    location: "Gwalior, Madhya Pradesh",
+    enrollmentNumber: "852/2011 (listed in 2020 panel list)",
+    experience: "",
+    fee: "",
+    keywords: [],
+    isDemo: false
   },
   {
-    name: "Demo Lawyer C",
-    category: "property",
-    specialty: "Rental Deposits and Tenant Disputes",
-    experience: "8 years (illustrative)",
-    fee: "₹800 (sample fee)",
-    keywords: ["rent", "rental", "tenant", "landlord", "deposit", "eviction"]
-  },
-  {
-    name: "Demo Lawyer D",
-    category: "property",
-    specialty: "Property Ownership and Title Disputes",
-    experience: "9 years (illustrative)",
-    fee: "₹1,000 (sample fee)",
-    keywords: ["ownership", "title", "land", "property", "boundary"]
-  },
-  {
-    name: "Demo Lawyer E",
-    category: "consumer",
-    specialty: "Refunds and Defective Products",
-    experience: "7 years (illustrative)",
-    fee: "₹750 (sample fee)",
-    keywords: ["refund", "defective", "consumer", "product", "seller"]
-  },
-  {
-    name: "Demo Lawyer F",
-    category: "business",
-    specialty: "Contracts and Unpaid Invoices",
-    experience: "8 years (illustrative)",
-    fee: "₹1,000 (sample fee)",
-    keywords: ["contract", "invoice", "commercial", "business", "agreement"]
-  },
-  {
-    name: "Demo Lawyer G",
-    category: "family",
-    specialty: "Divorce and Matrimonial Matters",
-    experience: "10 years (illustrative)",
-    fee: "₹1,000 (sample fee)",
-    keywords: ["divorce", "marriage", "matrimonial", "spouse"]
-  },
-  {
-    name: "Demo Lawyer H",
-    category: "criminal",
-    specialty: "Criminal Complaints and Defence",
-    experience: "9 years (illustrative)",
-    fee: "₹1,200 (sample fee)",
-    keywords: ["police", "arrest", "criminal", "fir", "theft", "assault"]
+    name: "Nitin Sharma",
+    category: "general",
+    specialty: "Practice areas need confirmation",
+    location: "Gwalior, Madhya Pradesh",
+    enrollmentNumber: "2118/2011 (listed in 2020 panel list)",
+    experience: "",
+    fee: "",
+    keywords: [],
+    isDemo: false
   }
 ];
-
   function identifyCategory(text) {
     const value = text.toLowerCase();
 
@@ -97,28 +65,38 @@ const relevantLaws = document.getElementById("relevant-laws");
   }
 
   function createLawyerCard(lawyer) {
-    const card = document.createElement("article");
-    card.className = "lawyer-card";
+  const card = document.createElement("article");
+  card.className = "lawyer-card";
 
-    const name = document.createElement("h3");
-    name.textContent = lawyer.name;
+  const addText = function (label, value) {
+    if (!value) return;
 
-    const specialty = document.createElement("p");
-    specialty.textContent = lawyer.specialty;
+    const item = document.createElement("p");
+    item.textContent = label ? `${label}: ${value}` : value;
+    card.appendChild(item);
+  };
 
-    const experience = document.createElement("p");
-    experience.textContent = `Experience: ${lawyer.experience}`;
+  const name = document.createElement("h3");
+  name.textContent = lawyer.name;
+  card.appendChild(name);
 
-    const fee = document.createElement("p");
-    fee.textContent = lawyer.fee;
+  addText("", lawyer.specialty);
+  addText("Location", lawyer.location);
+  addText("Experience", lawyer.experience);
+  addText("Consultation fee", lawyer.fee);
+  addText("Enrollment number", lawyer.enrollmentNumber);
+  addText("Public contact", lawyer.phone);
 
-    const note = document.createElement("p");
-    note.className = "field-hint";
-    note.textContent = "Fictional demonstration profile — not bookable.";
+  const note = document.createElement("p");
+  note.className = "field-hint";
 
-    card.append(name, specialty, experience, fee, note);
-    return card;
-  }
+  note.textContent = lawyer.isDemo
+    ? "Fictional demonstration profile — not bookable."
+    : "Verification pending — confirm credentials and availability before hiring.";
+
+  card.appendChild(note);
+  return card;
+}
 
   form.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -139,6 +117,47 @@ const relevantLaws = document.getElementById("relevant-laws");
     nextSteps.replaceChildren();
 
     if (lawyerList) lawyerList.replaceChildren();
+    if (lawyerList) {
+  const problemText = description.toLowerCase();
+
+  const matches = lawyers
+    .map(function (lawyer) {
+      const keywordScore = lawyer.keywords.filter(function (keyword) {
+        return problemText.includes(keyword.toLowerCase());
+      }).length;
+
+      const categoryScore =
+        lawyer.category === category ? 2 :
+        lawyer.category === "general" ? 1 : 0;
+
+      return {
+        lawyer: lawyer,
+        score: categoryScore + keywordScore
+      };
+    })
+    .filter(function (match) {
+      return match.score > 0;
+    })
+    .sort(function (a, b) {
+      return b.score - a.score;
+    })
+    .map(function (match) {
+      return match.lawyer;
+    });
+
+  if (matches.length) {
+    matches.forEach(function (lawyer) {
+      lawyerList.appendChild(createLawyerCard(lawyer));
+    });
+  } else {
+    const message = document.createElement("p");
+    message.className = "field-hint";
+    message.textContent =
+      "No matching profiles found. Please explore the lawyer directory.";
+
+    lawyerList.appendChild(message);
+  }
+}
     if (status) status.textContent = "Please wait while Gemini analyzes your description.";
 
     try {
@@ -182,26 +201,8 @@ data.relevantLaws.forEach(function (law) {
         nextSteps.appendChild(item);
       });
 
-      // Show lawyer matches only on pages that contain the lawyer list.
-      if (lawyerList) {
-        const matches = lawyers.filter(function (lawyer) {
-  return lawyer.category === category;
-});
-
-if (matches.length) {
-  matches.forEach(function (lawyer) {
-    lawyerList.appendChild(createLawyerCard(lawyer));
-  });
-} else {
-  const message = document.createElement("p");
-  message.className = "field-hint";
-  message.textContent =
-    "We couldn't find a matching sample profile for this issue. " +
-    "Try describing your problem in more detail or explore the full lawyer directory.";
-
-  lawyerList.appendChild(message);
-}
-      }
+      
+      
 
       if (status) status.textContent = "Analysis complete. This is general information, not legal advice.";
 
