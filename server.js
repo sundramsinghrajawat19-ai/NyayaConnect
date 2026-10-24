@@ -49,6 +49,7 @@ app.use(session({
   name: "nyaya.sid",
   secret: process.env.SESSION_SECRET,
   resave: false,
+  rolling: true,
   saveUninitialized: false,
   store: MongoStore.create({
     client,
@@ -56,12 +57,49 @@ app.use(session({
     collectionName: "sessions"
   }),
   cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 24 * 60 * 60 * 1000
-  }
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax"
+}
 }));
+// Automatically log out after 15 minutes of inactivity
+app.use((req, res, next) => {
+  const timeout = 15 * 60 * 1000;
+
+  if (!req.session?.user) {
+    return next();
+  }
+
+  const now = Date.now();
+  const lastActivity = req.session.lastActivity;
+
+  if (lastActivity && now - lastActivity >= timeout) {
+  return req.session.destroy((err) => {
+    if (err) {
+      console.error("Session timeout cleanup failed:", err.message);
+      return res.status(500).send("Could not expire session. Please try again.");
+    }
+
+    res.clearCookie("nyaya.sid", {
+      path: "/",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
+    });
+
+    if (req.path.startsWith("/api/")) {
+      return res.status(401).json({
+        error: "Session expired. Please log in again."
+      });
+    }
+
+    return res.redirect("/login.html");
+  });
+}
+
+  req.session.lastActivity = now;
+  next();
+});
 
 // Protect HTML pages unless the user is logged in
 app.use((req, res, next) => {
@@ -321,6 +359,7 @@ app.post("/api/signup", async (req, res) => {
       name: name.trim(),
       email: normalizedEmail
     };
+    req.session.lastActivity = Date.now();
 
     await new Promise((resolve, reject) => {
       req.session.save(error => {
@@ -374,11 +413,13 @@ app.post("/api/login", async (req, res) => {
 
     await regenerateSession(req);
 
-    req.session.user = {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email
-    };
+req.session.user = {
+  id: user._id.toString(),
+  name: user.name,
+  email: user.email
+};
+
+req.session.lastActivity = Date.now();
 
     await new Promise((resolve, reject) => {
       req.session.save(error => {
