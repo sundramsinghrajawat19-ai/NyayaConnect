@@ -9,6 +9,7 @@ const { MongoClient } = require("mongodb");
 const multer = require("multer");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 
 const upload = multer({
