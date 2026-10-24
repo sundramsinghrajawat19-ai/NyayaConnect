@@ -484,7 +484,7 @@ app.post("/api/analyze", requireAuth, async (req, res) => {
 
     const aiStartTime = Date.now();
 const response = await ai.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-3.5-flash-lite",
       contents: `
 You are the general legal information assistant for NyayaConnect, focused on Indian law when the user's situation is in India.
 
