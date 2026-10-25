@@ -55,6 +55,62 @@
           <p>Unpaid salaries, workplace disputes and consumer complaints.</p>
           <p><strong>Sample profile · Not verified</strong></p>
         </article>
+    
+      </div>
+    </section>
+
+    <section class="workspace" id="book-consultation">
+      <div class="eyebrow">CONSULTATION REQUEST</div>
+      <h2>Request a consultation</h2>
+      <p class="field-hint">
+        Choose a practice area and preferred time. This demo saves a request
+        but does not confirm a real lawyer appointment.
+      </p>
+
+      <form id="appointment-form">
+        <label for="practice-area">Practice area</label>
+        <select id="practice-area" name="practiceArea" required>
+          <option value="">Choose a practice area</option>
+          <option>Property and Rental Matters</option>
+          <option>Family and Matrimonial Matters</option>
+          <option>Employment and Consumer Matters</option>
+        </select>
+
+        <label for="appointment-date">Preferred date</label>
+        <input id="appointment-date" name="appointmentDate"
+               type="date" required>
+
+        <label for="appointment-time">Preferred time</label>
+        <select id="appointment-time" name="appointmentTime" required>
+          <option value="">Choose a time</option>
+          <option value="09:00">9:00 AM</option>
+          <option value="10:00">10:00 AM</option>
+          <option value="11:00">11:00 AM</option>
+          <option value="12:00">12:00 PM</option>
+          <option value="13:00">1:00 PM</option>
+          <option value="14:00">2:00 PM</option>
+          <option value="15:00">3:00 PM</option>
+          <option value="16:00">4:00 PM</option>
+          <option value="17:00">5:00 PM</option>
+        </select>
+
+        <label for="appointment-description">Briefly describe your issue</label>
+        <textarea id="appointment-description" name="description"
+                  rows="4" minlength="10" maxlength="1000" required
+                  placeholder="Describe your legal issue (10–1000 characters)"></textarea>
+
+        <button type="submit" class="primary-button" id="appointment-submit">
+          Send consultation request
+        </button>
+        <p id="appointment-message" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="workspace" id="my-appointments">
+      <div class="eyebrow">YOUR REQUESTS</div>
+      <h2>My appointments</h2>
+      <div id="appointment-list">
+        <p class="field-hint">Loading your consultation requests…</p>
       </div>
     </section>
   </main>
@@ -64,5 +120,118 @@
     <p>This prototype does not provide legal advice or create a lawyer-client relationship.</p>
     <p><a href="/">Home</a> · <a href="/analyze.html">Analyze your case</a></p>
   </footer>
+
+  <script>
+    const form = document.getElementById("appointment-form");
+    const message = document.getElementById("appointment-message");
+    const submitButton = document.getElementById("appointment-submit");
+    const appointmentList = document.getElementById("appointment-list");
+    const dateInput = document.getElementById("appointment-date");
+
+    // Prevent choosing today or a past date (India time).
+    function getIndiaDate() {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+
+  const values = {};
+  parts.forEach(part => {
+    values[part.type] = part.value;
+  });
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+const today = getIndiaDate();
+dateInput.min = today;
+
+    async function loadAppointments() {
+      try {
+        const response = await fetch("/api/appointments");
+        if (response.status === 401) {
+          appointmentList.textContent = "Please log in to view your requests.";
+          return;
+        }
+        if (!response.ok) throw new Error();
+
+        const items = await response.json();
+        appointmentList.replaceChildren();
+
+        if (!items.length) {
+          appointmentList.textContent = "You haven't sent any consultation requests yet.";
+          return;
+        }
+
+        items.forEach(item => {
+          const card = document.createElement("article");
+          card.className = "result-panel";
+
+          const heading = document.createElement("h3");
+          heading.textContent = item.practiceArea;
+          card.appendChild(heading);
+
+          const details = document.createElement("p");
+          details.textContent =
+            "Preferred date: " + item.appointmentDate +
+            " · Time: " + item.appointmentTime;
+          card.appendChild(details);
+
+          const status = document.createElement("p");
+          status.textContent = "Status: " + item.status +
+            " · Demo request, not a confirmed appointment";
+          card.appendChild(status);
+
+          appointmentList.appendChild(card);
+        });
+      } catch {
+        appointmentList.textContent = "Could not load your requests. Please refresh the page.";
+      }
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      message.textContent = "";
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending request…";
+
+      const payload = {
+        practiceArea: document.getElementById("practice-area").value,
+        appointmentDate: dateInput.value,
+        appointmentTime: document.getElementById("appointment-time").value,
+        description: document.getElementById("appointment-description").value
+      };
+
+      try {
+        const response = await fetch("/api/appointments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.status === 401) {
+          message.textContent = "Please log in before requesting a consultation.";
+          return;
+        }
+        if (!response.ok) throw new Error(result.error || "Request failed.");
+
+        message.textContent = result.message;
+        form.reset();
+        dateInput.min = today;
+        await loadAppointments();
+      } catch (error) {
+        message.textContent = error.message || "Could not send your request. Please try again.";
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Send consultation request";
+      }
+    });
+
+    loadAppointments();
+  </script>
 </body>
 </html>

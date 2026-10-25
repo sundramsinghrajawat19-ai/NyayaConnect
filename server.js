@@ -41,9 +41,42 @@ const client = new MongoClient(process.env.MONGODB_URI, {
 let db;
 let users;
 let cases;
+let appointments;
+// Official legal sources reviewed for NyayaConnect.
+// A listed source alone does NOT verify a legal section.
+const VERIFIED_LEGAL_SOURCES = [
+  {
+    actName: "The Code on Wages, 2019",
+    officialSourceUrl:
+      "https://www.indiacode.nic.in/indiacode/handle/123456789/15793?view_type=browse",
+    verifiedSections: []
+  }
+];
+
+function verifyLegalReference(law) {
+  const source = VERIFIED_LEGAL_SOURCES.find(
+    item =>
+      item.actName.toLowerCase() === law.actName.trim().toLowerCase() &&
+      item.officialSourceUrl === law.officialSourceUrl
+  );
+
+  if (
+    source &&
+    source.verifiedSections.includes(law.section)
+  ) {
+    return {
+      ...law,
+      verificationStatus: "verified"
+    };
+  }
+
+  return {
+    ...law,
+    verificationStatus: "needs_verification"
+  };
+}
 
 app.use(express.json());
-
 
 app.use(session({
   name: "nyaya.sid",
@@ -275,8 +308,15 @@ async function connectDB() {
   await client.connect();
 
   db = client.db("nyayaconnect");
-  users = db.collection("users");
-  cases = db.collection("case_analyses");
+users = db.collection("users");
+cases = db.collection("case_analyses");
+appointments = db.collection("appointments");
+
+await appointments.createIndex({ userId: 1, createdAt: -1 });
+await appointments.createIndex(
+  { appointmentDate: 1, appointmentTime: 1, practiceArea: 1 },
+  { unique: false }
+);
 
   await db.command({ ping: 1 });
 
@@ -482,6 +522,81 @@ app.get("/api/test-db", async (req, res) => {
 
 // Private case history: only return this user's cases
 app.get("/api/cases", requireAuth, async (req, res) => {
+  // Create a consultation request
+app.post("/api/appointments", requireAuth, async (req, res) => {
+  try {
+    const { practiceArea, appointmentDate, appointmentTime, description } = req.body;
+
+    const allowedAreas = [
+      "Property and Rental Matters",
+      "Family and Matrimonial Matters",
+      "Employment and Consumer Matters"
+    ];
+
+    if (!allowedAreas.includes(practiceArea)) {
+      return res.status(400).json({ error: "Please select a valid practice area." });
+    }
+
+    if (
+      typeof appointmentDate !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(appointmentDate) ||
+      appointmentDate <= new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" })
+    ) {
+      return res.status(400).json({ error: "Please choose a future date." });
+    }
+
+    if (
+      typeof appointmentTime !== "string" ||
+      !/^(09|10|11|12|13|14|15|16|17):00$/.test(appointmentTime)
+    ) {
+      return res.status(400).json({ error: "Please select an available hour between 9 AM and 5 PM." });
+    }
+
+    if (
+      typeof description !== "string" ||
+      description.trim().length < 10 ||
+      description.trim().length > 1000
+    ) {
+      return res.status(400).json({ error: "Describe your legal issue in 10–1000 characters." });
+    }
+
+    const appointment = {
+      userId: req.session.user.id,
+      practiceArea,
+      appointmentDate,
+      appointmentTime,
+      description: description.trim(),
+      status: "requested",
+      isDemo: true,
+      createdAt: new Date()
+    };
+
+    const saved = await appointments.insertOne(appointment);
+
+    res.status(201).json({
+      message: "Consultation request saved. This is a demo request, not a confirmed appointment.",
+      appointment: { ...appointment, _id: saved.insertedId }
+    });
+  } catch (error) {
+    console.error("Appointment request failed:", error.message);
+    res.status(500).json({ error: "Unable to save the consultation request." });
+  }
+});
+
+// Get only the logged-in user's consultation requests
+app.get("/api/appointments", requireAuth, async (req, res) => {
+  try {
+    const list = await appointments
+      .find({ userId: req.session.user.id })
+      .sort({ createdAt: -1 })
+      .toArray();
+
+    res.json(list);
+  } catch (error) {
+    console.error("Failed to load appointments:", error.message);
+    res.status(500).json({ error: "Unable to load your consultation requests." });
+  }
+});
   try {
     const savedCases = await cases
       .find({ userId: req.session.user.id })
@@ -537,6 +652,11 @@ Avoid repeating the same information across sections.
 Do not claim to be a lawyer or give a definitive legal opinion.
 Do not invent laws, citations, deadlines, legal sections, or facts.
 Mention relevant Indian laws only when you can identify them confidently. If uncertain, say that the applicable law needs verification.
+Return relevantLaws as an array of objects matching the JSON schema.
+Always set verificationStatus to "needs_verification".
+Never claim a law or section is verified based only on your own knowledge.
+Never invent an Act name, section number, or official source URL.
+If no relevant law can be identified confidently, return an empty array.
 Explain potential risks and consequences without presenting uncertain outcomes as facts.
 Give practical next steps and a checklist of potentially useful evidence.
 If jurisdiction is unknown, explain that laws vary by location.
@@ -557,7 +677,13 @@ Return only valid JSON in this format:
     "A potentially useful document or piece of evidence"
   ],
   "relevantLaws": [
-    "A relevant law and brief explanation, if confidently identified; otherwise state that verification is needed"
+    {
+      "actName": "Exact name of the relevant Act, or Unknown",
+      "section": "Exact section number, or Unknown",
+      "explanation": "Brief explanation of how it may apply",
+      "officialSourceUrl": "Official source URL only if confidently known; otherwise an empty string",
+      "verificationStatus": "verified or needs_verification"
+    }
   ]
 }
 
@@ -580,8 +706,16 @@ ${problem.trim()}
   !result.risks.every(item => typeof item === "string") ||
   !Array.isArray(result.evidenceChecklist) ||
   !result.evidenceChecklist.every(item => typeof item === "string") ||
-  !Array.isArray(result.relevantLaws) ||
-  !result.relevantLaws.every(item => typeof item === "string")
+    !Array.isArray(result.relevantLaws) ||
+  !result.relevantLaws.every(item =>
+    item &&
+    typeof item === "object" &&
+    typeof item.actName === "string" &&
+    typeof item.section === "string" &&
+    typeof item.explanation === "string" &&
+    typeof item.officialSourceUrl === "string" &&
+    item.verificationStatus === "needs_verification"
+  )
 ) {
       throw new Error("Invalid response format");
     }
@@ -593,7 +727,7 @@ ${problem.trim()}
   risks: result.risks,
   nextSteps: result.nextSteps,
   evidenceChecklist: result.evidenceChecklist,
-  relevantLaws: result.relevantLaws,
+  relevantLaws: result.relevantLaws.map(verifyLegalReference),
   createdAt: new Date()
 });
 
@@ -605,7 +739,7 @@ ${problem.trim()}
   risks: result.risks,
   nextSteps: result.nextSteps,
   evidenceChecklist: result.evidenceChecklist,
-  relevantLaws: result.relevantLaws
+  relevantLaws: result.relevantLaws.map(verifyLegalReference)
 });
   } catch (error) {
     console.error("Gemini analysis failed:", error.message);

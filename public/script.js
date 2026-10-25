@@ -178,12 +178,72 @@ data.evidenceChecklist.forEach(function (evidence) {
   evidenceChecklist.appendChild(item);
 });
 
+
 relevantLaws.replaceChildren();
+
 data.relevantLaws.forEach(function (law) {
   const item = document.createElement("li");
-  item.textContent = law;
+
+  const title = document.createElement("strong");
+  title.textContent = law.actName || "Legal reference needs verification";
+  item.appendChild(title);
+
+  const section = document.createElement("p");
+  section.textContent = "Section: " + (law.section || "Needs verification");
+  item.appendChild(section);
+
+  const details = document.createElement("p");
+  details.textContent = law.explanation || "Check with a qualified lawyer.";
+  item.appendChild(details);
+
+  const status = document.createElement("p");
+  status.textContent = "Status: Needs verification";
+  item.appendChild(status);
+
+  
+let sourceUrl = "";
+
+if (law.officialSourceUrl) {
+  try {
+    const url = new URL(law.officialSourceUrl);
+
+    const trustedDomains = [
+      "indiacode.gov.in",
+      "www.indiacode.gov.in",
+      "indiacode.nic.in",
+      "www.indiacode.nic.in",
+      "egazette.nic.in",
+      "www.egazette.nic.in",
+      "egazette.gov.in",
+      "www.egazette.gov.in",
+      "sci.gov.in",
+      "www.sci.gov.in"
+    ];
+
+    if (
+      url.protocol === "https:" &&
+      trustedDomains.includes(url.hostname)
+    ) {
+      sourceUrl = url.href;
+    }
+  } catch {
+    // Fall back to the official legislation portal.
+  }
+}
+
+const link = document.createElement("a");
+link.href = sourceUrl || "https://www.indiacode.nic.in/";
+link.target = "_blank";
+link.rel = "noopener noreferrer";
+link.textContent = sourceUrl
+  ? "Open official source"
+  : "Search India Code (official legislation portal)";
+item.appendChild(link);
+
+
   relevantLaws.appendChild(item);
 });
+
 
       data.nextSteps.forEach(function (step) {
         const item = document.createElement("li");
